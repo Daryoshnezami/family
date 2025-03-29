@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+
+
+      min-height: 100vh;
+      color: white;
+    }
+
+    .top-bar {
+      width: 100%;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .top-bar span {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .top-bar button {
+      padding: 8px 16px;
+      background: #6a11cb;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .top-bar button:hover {
+      background: #2575fc;
+    }
+
+    .dashboard-container {
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .chart {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      /* 7 days + 1 column for activities */
+      gap: 10px;
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .chart div {
+      padding: 10px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .chart div:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .chart .activity {
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .chart .day {
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .chart input[type="checkbox"] {
+      cursor: pointer;
+    }
+
+    .chart input[type="checkbox"]:checked {
+      accent-color: #6a11cb;
+    }
+
+    .completion-counter {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top-bar">
+    <span id="user-name"></span>
+    <button onclick="window.location.href='register.html'">Add New</button>
+  </div>
+  <div class="dashboard-container">
+    <h2>Daily Activity Chart</h2>
+    <div class="chart" id="activity-chart"></div>
+    <div class="completion-counter">
+      Completed Activities: <span id="completed-count">0</span> / <span id="total-count">0</span>
+    </div>
+    <button onclick="resetChart()"
+      style="margin-top: 20px; padding: 10px 20px; background: #6a11cb; color: white; border: none; border-radius: 5px; cursor: pointer;">Restart</button>
+  </div>
+  <script>
+    const userName = localStorage.getItem('userName');
+    const userPassword = localStorage.getItem('userPassword');
+    const activities = JSON.parse(localStorage.getItem('userActivities'));
+
+    // Display the user's name in the top bar
+    document.getElementById('user-name').innerText = `Welcome, ${userName}!`;
+
+    // Days of the week
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    // Create the chart
+    const chartContainer = document.getElementById('activity-chart');
+
+    // Add days as headers
+    chartContainer.innerHTML = `<div class="day"></div>`; // Empty top-left corner
+    days.forEach(day => {
+      chartContainer.innerHTML += `<div class="day">${day}</div>`;
+    });
+
+    // Add activities and checkboxes
+    activities.forEach(activity => {
+      chartContainer.innerHTML += `<div class="activity">${activity.name} (${activity.time})</div>`;
+      days.forEach(() => {
+        chartContainer.innerHTML += `<div><input type="checkbox" class="activity-checkbox"></div>`;
+      });
+    });
+
+    // Update completion counter
+    const completedCount = document.getElementById('completed-count');
+    const totalCount = document.getElementById('total-count');
+    const checkboxes = document.querySelectorAll('.activity-checkbox');
+
+    // Set total count of activities
+    totalCount.innerText = checkboxes.length;
+
+    // Add event listeners to checkboxes
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateCompletionCounter);
+    });
+
+    // Function to update the completion counter
+    function updateCompletionCounter() {
+      const completed = document.querySelectorAll('.activity-checkbox:checked').length;
+      completedCount.innerText = completed;
+    }
+
+    // Password verification when clicking the user's name
+    document.getElementById('user-name').addEventListener('click', function () {
+      const password = prompt('Enter your password:');
+      if (password === userPassword) {
+        alert('Welcome to your daily chart!');
+      } else {
+        alert('Wrong password. Please try again.');
+      }
+    });
+
+    // Reset chart
+    function resetChart() {
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      updateCompletionCounter();
+    }
+  </script>
+</body>
+
+</html>

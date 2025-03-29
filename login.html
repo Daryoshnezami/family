@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Login - Daily Tracker</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 400px;
+    }
+
+    h1 {
+      color: #6a11cb;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .welcome-text {
+      text-align: center;
+      color: #666;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 1rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #6a11cb;
+      box-shadow: 0 0 0 2px rgba(106, 17, 203, 0.1);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #02a2ff 0%, #5adfd0 100%);
+
+      transform: translateY(-1px);
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .error-message {
+      background: #ffe6e6;
+      color: #ff0000;
+      border: 1px solid #ffcccc;
+    }
+
+    .success-message {
+      background: #e6ffe6;
+      color: #006600;
+      border: 1px solid #ccffcc;
+    }
+
+    .links {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .links a {
+      color: #6a11cb;
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: block;
+      margin: 0.5rem 0;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    .family-icon {
+      font-size: 3rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1rem 0;
+      color: #666;
+    }
+
+    .remember-me input {
+      width: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-container">
+
+    <h1>Welcome Back!</h1>
+    <p class="welcome-text">Log in to track your daily activities</p>
+
+    <form id="login-form" onsubmit="login(event)">
+      <div class="form-group">
+        <label for="password">name</label>
+        <input type="text" id="username" placeholder="Enter your name" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Your Passcode</label>
+        <input type="password" id="password" placeholder="Enter your passcode" required>
+      </div>
+      <div class="remember-me">
+        <input type="checkbox" id="remember-me">
+        <label for="remember-me">Remember my name</label>
+      </div>
+      <div id="message" style="display: none;"></div>
+      <button type="submit">Login</button>
+      <div class="links">
+        <a href="register.html">Don't have an account? Join the family!</a>
+        <a href="dad_login.html">Dad? Click here</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Check if user is already logged in
+    if (localStorage.getItem('currentUser')) {
+      window.location.href = 'chart.html';
+    }
+
+    // Check for remembered user
+    const rememberedUser = localStorage.getItem('rememberedUser');
+    if (rememberedUser) {
+      document.getElementById('username').value = rememberedUser;
+      document.getElementById('remember-me').checked = true;
+    }
+
+    function login(event) {
+      event.preventDefault();
+
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const rememberMe = document.getElementById('remember-me').checked;
+
+      // Get users from localStorage
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+
+      // Find user
+      const user = users.find(u => u.name === username);
+
+      if (!user) {
+        showMessage('Name not found. Please register first!', 'error');
+        return;
+      }
+
+      if (user.password !== password) {
+        showMessage('Wrong passcode. Please try again!', 'error');
+        return;
+      }
+
+      // Login successful
+      localStorage.setItem('currentUser', username);
+      if (rememberMe) {
+        localStorage.setItem('rememberedUser', username);
+      } else {
+        localStorage.removeItem('rememberedUser');
+      }
+
+      showMessage('Welcome back! Taking you to your activities...', 'success');
+      setTimeout(() => {
+        window.location.href = 'chart.html';
+      }, 1500);
+    }
+
+    function showMessage(text, type) {
+      const messageDiv = document.getElementById('message');
+      messageDiv.textContent = text;
+      messageDiv.className = type === 'error' ? 'message error-message' : 'message success-message';
+      messageDiv.style.display = 'block';
+    }
+  </script>
+</body>
+
+</html>

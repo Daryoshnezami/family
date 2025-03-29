@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Activity Chart - Daily Tracker</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+      min-height: 100vh;
+      color: white;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .title {
+      font-size: 2rem;
+      margin: 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      backdrop-filter: blur(5px);
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .activity-grid {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      color: #333;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .activity-row {
+      display: grid;
+      grid-template-columns: 2fr repeat(7, 1fr);
+      gap: 1rem;
+      padding: 0.8rem;
+      border-bottom: 1px solid #eee;
+      align-items: center;
+    }
+
+    .activity-row.header {
+      font-weight: bold;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+    }
+
+    .activity-cell {
+      text-align: center;
+    }
+
+    .activity-cell:first-child {
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .activity-checkbox {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #6a11cb;
+    }
+
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 1.5rem;
+      border-radius: 15px;
+      text-align: center;
+      color: #333;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-card h3 {
+      margin: 0;
+      font-size: 2.5rem;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: bold;
+    }
+
+    .stat-card p {
+      margin: 0.5rem 0 0;
+      color: #666;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .activity-row {
+        grid-template-columns: 2fr repeat(7, 1fr);
+        font-size: 0.9rem;
+        gap: 0.5rem;
+      }
+
+      .stats-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .no-activities {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      font-size: 1.2rem;
+    }
+
+    .add-activity-btn {
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+      color: white;
+      font-weight: bold;
+    }
+
+    .add-activity-btn:hover {
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title" id="chart-title">Daily Activity Chart</h1>
+      <div class="button-group">
+        <button id="add-activity-btn" class="add-activity-btn">Add Activity</button>
+        <button id="reset-chart-btn">Reset Chart</button>
+        <button id="back-btn" style="display: none;" onclick="window.location.href='dad_dashboard.html'">Back to
+          Dashboard</button>
+        <button onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="stats-container">
+      <div class="stat-card">
+        <h3 id="weekly-progress">0%</h3>
+        <p>Weekly Progress</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="completed-activities">0</h3>
+        <p>Completed Activities</p>
+      </div>
+      <div class="stat-card">
+        <h3 id="total-activities">0</h3>
+        <p>Total Activities</p>
+      </div>
+    </div>
+
+    <div class="activity-grid" id="activity-grid">
+      <!-- Activities will be populated here -->
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Get current user or viewing user
+      const viewingUser = localStorage.getItem('viewingUser');
+      const currentUser = localStorage.getItem('currentUser');
+      const isDadAdmin = localStorage.getItem('isDadAdmin');
+      const displayUser = viewingUser || currentUser;
+
+      if (!displayUser) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Update header text
+      if (viewingUser && isDadAdmin) {
+        document.getElementById('chart-title').textContent = `Viewing ${viewingUser}'s Chart`;
+        document.getElementById('back-btn').style.display = 'block';
+      } else {
+        document.getElementById('chart-title').textContent = 'Daily Activity Chart';
+        document.getElementById('back-btn').style.display = isDadAdmin ? 'block' : 'none';
+      }
+
+      // Initialize or get activities from localStorage
+      let activities = JSON.parse(localStorage.getItem(`activities_${displayUser}`)) || [];
+      let completedActivities = JSON.parse(localStorage.getItem(`completed_${displayUser}`)) || {};
+
+      // Create activity grid
+      createActivityGrid(activities, completedActivities);
+      updateStatistics();
+
+      // Add event listener for checkboxes only if user is viewing their own chart
+      if (!viewingUser || currentUser === viewingUser) {
+        document.querySelectorAll('.activity-checkbox').forEach(checkbox => {
+          checkbox.addEventListener('change', function () {
+            const activityName = this.dataset.activity;
+            const day = this.dataset.day;
+            const key = `${activityName}_${day}`;
+
+            if (this.checked) {
+              completedActivities[key] = true;
+            } else {
+              delete completedActivities[key];
+            }
+
+            localStorage.setItem(`completed_${displayUser}`, JSON.stringify(completedActivities));
+            updateStatistics();
+          });
+        });
+      }
+
+      // Add activity button functionality
+      const addActivityBtn = document.getElementById('add-activity-btn');
+      if (!viewingUser || currentUser === viewingUser) {
+        addActivityBtn.addEventListener('click', function () {
+          const activityName = prompt('Enter activity name:');
+          if (!activityName) return;
+
+          const activityTime = prompt('Enter activity time (e.g. 30m, 1h):');
+          if (!activityTime) return;
+
+          activities.push({
+            name: activityName,
+            time: activityTime
+          });
+
+          localStorage.setItem(`activities_${displayUser}`, JSON.stringify(activities));
+          createActivityGrid(activities, completedActivities);
+          updateStatistics();
+        });
+        addActivityBtn.style.display = 'block';
+      } else {
+        addActivityBtn.style.display = 'none';
+      }
+
+      // Reset chart button functionality
+      const resetChartBtn = document.getElementById('reset-chart-btn');
+      if (!viewingUser || currentUser === viewingUser) {
+        resetChartBtn.addEventListener('click', function () {
+          if (confirm('Are you sure you want to reset all checkboxes?')) {
+            completedActivities = {};
+            localStorage.setItem(`completed_${displayUser}`, JSON.stringify(completedActivities));
+            createActivityGrid(activities, completedActivities);
+            updateStatistics();
+          }
+        });
+        resetChartBtn.style.display = 'block';
+      } else {
+        resetChartBtn.style.display = 'none';
+      }
+    });
+
+    function createActivityGrid(activities, completedActivities) {
+      const grid = document.getElementById('activity-grid');
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+      if (activities.length === 0) {
+        grid.innerHTML = '<div class="no-activities">No activities added yet. Click "Add Activity" to get started!</div>';
+        return;
+      }
+
+      // Create header row
+      let html = '<div class="activity-row header"><div class="activity-cell">Activity</div>';
+      days.forEach(day => {
+        html += `<div class="activity-cell">${day}</div>`;
+      });
+      html += '</div>';
+
+      // Create activity rows
+      activities.forEach(activity => {
+        html += `<div class="activity-row">
+          <div class="activity-cell">${activity.name} (${activity.time})</div>`;
+
+        days.forEach(day => {
+          const key = `${activity.name}_${day}`;
+          const isChecked = completedActivities[key] ? 'checked' : '';
+          const isDisabled = localStorage.getItem('viewingUser') &&
+            localStorage.getItem('currentUser') !== localStorage.getItem('viewingUser') ?
+            'disabled' : '';
+
+          html += `<div class="activity-cell">
+            <input type="checkbox" 
+                   class="activity-checkbox" 
+                   data-activity="${activity.name}" 
+                   data-day="${day}" 
+                   ${isChecked} 
+                   ${isDisabled}>
+          </div>`;
+        });
+        html += '</div>';
+      });
+
+      grid.innerHTML = html;
+    }
+
+    function updateStatistics() {
+      const displayUser = localStorage.getItem('viewingUser') || localStorage.getItem('currentUser');
+      const activities = JSON.parse(localStorage.getItem(`activities_${displayUser}`)) || [];
+      const completedActivities = JSON.parse(localStorage.getItem(`completed_${displayUser}`)) || {};
+
+      const totalPossible = activities.length * 7;
+      const completedCount = Object.keys(completedActivities).filter(key => completedActivities[key]).length;
+      const weeklyProgress = totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0;
+
+      document.getElementById('weekly-progress').textContent = `${weeklyProgress}%`;
+      document.getElementById('completed-activities').textContent = completedCount;
+      document.getElementById('total-activities').textContent = totalPossible;
+    }
+
+    function logout() {
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('viewingUser');
+      localStorage.removeItem('isDadAdmin');
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+
+</html>

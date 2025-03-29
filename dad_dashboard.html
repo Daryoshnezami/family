@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DAD Dashboard - Daily Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+      min-height: 100vh;
+      color: white;
+    }
+
+    .dashboard-container {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .top-bar {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      margin-bottom: 2rem;
+      border-radius: 10px;
+    }
+
+    .top-bar h1 {
+      margin: 0;
+      color: white;
+      font-size: 1.8rem;
+    }
+
+    .top-bar button {
+      padding: 8px 16px;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .top-bar button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
+    }
+
+    .users-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .user-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 1.5rem;
+      color: #333;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .user-card h3 {
+      margin: 0 0 1rem 0;
+      color: #6a11cb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .user-card .view-chart-btn {
+      padding: 6px 12px;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .user-card .view-chart-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
+    }
+
+    .user-card .card-content {
+      cursor: pointer;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e9ecef;
+      border-radius: 4px;
+      margin: 0.5rem 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+      transition: width 0.3s ease;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .stat-item {
+      background: #f8f9fa;
+      padding: 0.8rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-item .label {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 0.3rem;
+    }
+
+    .stat-item .value {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #6a11cb;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      color: #333;
+      position: relative;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .close-modal:hover {
+      color: #333;
+    }
+
+    .charts-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .chart-card {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-card h4 {
+      margin: 0 0 1rem 0;
+      color: #6a11cb;
+      font-size: 1.2rem;
+    }
+
+    .chart-controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .chart-controls button {
+      padding: 8px 16px;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .chart-controls button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
+    }
+
+    .chart-controls button.active {
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+    }
+
+    .activity-list {
+      margin-top: 1.5rem;
+    }
+
+    .activity-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem;
+      background: #f8f9fa;
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+    }
+
+    .activity-item .status {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .status.completed {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status.missed {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .status.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-container {
+        padding: 1rem;
+      }
+
+      .users-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .charts-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .top-bar-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .search-box {
+      position: relative;
+      width: 300px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 8px 16px;
+      padding-left: 40px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .dashboard-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1.5rem;
+      border-radius: 10px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .stat-card h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .stat-card p {
+      margin: 0.5rem 0 0;
+      font-size: 2rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    .no-users {
+      text-align: center;
+      padding: 3rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+
+    .no-users p {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 1rem;
+    }
+
+    .no-users button {
+      padding: 10px 20px;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .no-users button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3);
+    }
+
+    .user-card .user-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .user-card .user-actions button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .user-card .delete-btn {
+      background: linear-gradient(to right, #ff4444, #ff0000);
+      color: white;
+    }
+
+    .user-card .delete-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <div class="top-bar">
+      <h1>DAD Dashboard</h1>
+      <div class="top-bar-controls">
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="Search users...">
+          <span class="search-icon">🔍</span>
+        </div>
+        <button onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="dashboard-stats">
+      <div class="stat-card">
+        <h3>Total Users</h3>
+        <p id="total-users">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Active Users</h3>
+        <p id="active-users">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Average Completion Rate</h3>
+        <p id="average-completion">0%</p>
+      </div>
+    </div>
+
+    <div class="users-grid" id="users-grid">
+      <!-- User cards will be added here -->
+    </div>
+  </div>
+
+  <div class="modal" id="user-modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+      <h2 id="modal-username"></h2>
+
+      <div class="charts-container">
+        <div class="chart-card">
+          <h4>Weekly Progress</h4>
+          <div class="chart-controls">
+            <button onclick="toggleChartType('progress', 'line')" class="active">Line Chart</button>
+            <button onclick="toggleChartType('progress', 'bar')">Bar Chart</button>
+          </div>
+          <canvas id="progress-chart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h4>Activity Completion</h4>
+          <div class="chart-controls">
+            <button onclick="toggleChartType('completion', 'doughnut')" class="active">Pie Chart</button>
+            <button onclick="toggleChartType('completion', 'bar')">Bar Chart</button>
+          </div>
+          <canvas id="completion-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="activity-list" id="activity-list">
+        <!-- Activity details will be added here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check admin status
+    if (!localStorage.getItem('isDadAdmin')) {
+      window.location.href = 'dad_login.html';
+    }
+
+    // Get all users
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const usersGrid = document.getElementById('users-grid');
+    const userModal = document.getElementById('user-modal');
+    let currentUser = null;
+    let progressChart = null;
+    let completionChart = null;
+    let currentProgressType = 'line';
+    let currentCompletionType = 'doughnut';
+
+    // Initialize dashboard
+    function initializeDashboard() {
+      // Check if user is dad admin
+      if (!localStorage.getItem('isDadAdmin')) {
+        window.location.href = 'dad_login.html';
+        return;
+      }
+
+      // Clean up duplicate users
+      cleanupUsers();
+
+      // Get all users
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+
+      // Update statistics
+      updateStatistics(users);
+
+      // Create user cards
+      createUserCards(users);
+    }
+
+    // Clean up duplicate users and their data
+    function cleanupUsers() {
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      const seenUsers = new Set();
+      const cleanUsers = [];
+
+      users.forEach(user => {
+        if (!seenUsers.has(user.name)) {
+          seenUsers.add(user.name);
+          cleanUsers.push(user);
+        } else {
+          // Merge activities and completed activities if they exist
+          const activities = JSON.parse(localStorage.getItem(`activities_${user.name}`)) || [];
+          const completedActivities = JSON.parse(localStorage.getItem(`completed_${user.name}`)) || {};
+
+          // Remove duplicate user data
+          localStorage.removeItem(`activities_${user.name}`);
+          localStorage.removeItem(`completed_${user.name}`);
+        }
+      });
+
+      // Save cleaned users list
+      localStorage.setItem('users', JSON.stringify(cleanUsers));
+    }
+
+    function updateStatistics(users) {
+      const totalUsers = users.length;
+
+      let totalCompletionRate = 0;
+      let activeUsers = 0;
+
+      users.forEach(user => {
+        const activities = JSON.parse(localStorage.getItem(`activities_${user.name}`)) || [];
+        const completedActivities = JSON.parse(localStorage.getItem(`completed_${user.name}`)) || {};
+
+        const totalPossible = activities.length * 7;
+        const completedCount = Object.keys(completedActivities).filter(key => completedActivities[key]).length;
+
+        if (completedCount > 0) {
+          activeUsers++;
+        }
+
+        if (totalPossible > 0) {
+          totalCompletionRate += (completedCount / totalPossible) * 100;
+        }
+      });
+
+      const averageCompletion = totalUsers > 0 ? Math.round(totalCompletionRate / totalUsers) : 0;
+
+      document.getElementById('total-users').textContent = totalUsers;
+      document.getElementById('active-users').textContent = activeUsers;
+      document.getElementById('average-completion').textContent = `${averageCompletion}%`;
+    }
+
+    function createUserCards(users) {
+      const userGrid = document.getElementById('users-grid');
+      userGrid.innerHTML = '';
+
+      if (users.length === 0) {
+        userGrid.innerHTML = '<div class="no-users">No users found</div>';
+        return;
+      }
+
+      users.forEach(user => {
+        const activities = JSON.parse(localStorage.getItem(`activities_${user.name}`)) || [];
+        const completedActivities = JSON.parse(localStorage.getItem(`completed_${user.name}`)) || {};
+
+        // Calculate total possible activities (activities × 7 days)
+        const totalPossible = activities.length * 7;
+
+        // Count completed activities
+        const completedCount = Object.keys(completedActivities).filter(key => completedActivities[key]).length;
+
+        // Calculate completion rate
+        const completionRate = totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0;
+
+        const card = document.createElement('div');
+        card.className = 'user-card';
+        card.innerHTML = `
+          <div class="user-info">
+            <h3>${user.name}</h3>
+            <div class="progress-bar">
+              <div class="progress" style="width: ${completionRate}%"></div>
+            </div>
+            <p>Completion Rate: ${completionRate}%</p>
+            <p>Activities: ${activities.length}</p>
+            <p>Completed: ${completedCount} / ${totalPossible}</p>
+          </div>
+          <div class="user-actions">
+            <button onclick="showUserDetails('${user.name}')">View Details</button>
+            <button onclick="viewUserChart('${user.name}')">View Chart</button>
+            <button onclick="deleteUser('${user.name}')" class="delete-btn">Delete Account</button>
+          </div>
+        `;
+        userGrid.appendChild(card);
+      });
+    }
+
+    // Toggle chart type
+    function toggleChartType(chart, type) {
+      if (chart === 'progress') {
+        currentProgressType = type;
+        updateProgressChart();
+        updateChartButtons('progress', type);
+      } else {
+        currentCompletionType = type;
+        updateCompletionChart();
+        updateChartButtons('completion', type);
+      }
+    }
+
+    // Update chart buttons
+    function updateChartButtons(chart, type) {
+      const buttons = document.querySelectorAll(`.chart-card:has(#${chart}-chart) .chart-controls button`);
+      buttons.forEach(button => {
+        button.classList.remove('active');
+        if (button.textContent.toLowerCase().includes(type)) {
+          button.classList.add('active');
+        }
+      });
+    }
+
+    // Show user details
+    function showUserDetails(username) {
+      currentUser = username;
+      document.getElementById('modal-username').textContent = `${username}'s Progress`;
+
+      const userActivities = JSON.parse(localStorage.getItem(`activities_${username}`)) || [];
+      const userCompletedActivities = JSON.parse(localStorage.getItem(`completed_${username}`)) || {};
+
+      // Update charts
+      updateProgressChart(userActivities, userCompletedActivities);
+      updateCompletionChart(userActivities, userCompletedActivities);
+
+      // Show activity list
+      const activityList = document.getElementById('activity-list');
+      activityList.innerHTML = userActivities.map(activity => {
+        const status = getActivityStatus(activity.name, userCompletedActivities);
+        return `
+          <div class="activity-item">
+            <span>${activity.name} (${activity.time})</span>
+            <span class="status ${status.class}">${status.text}</span>
+          </div>
+        `;
+      }).join('');
+
+      userModal.style.display = 'flex';
+    }
+
+    // Update progress chart
+    function updateProgressChart(activities, completedActivities) {
+      const ctx = document.getElementById('progress-chart').getContext('2d');
+      if (progressChart) progressChart.destroy();
+
+      const dailyProgress = calculateDailyProgress(activities, completedActivities);
+      const data = {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Daily Completion Rate',
+          data: dailyProgress,
+          borderColor: '#6a11cb',
+          backgroundColor: 'rgba(106, 17, 203, 0.2)',
+          tension: 0.4,
+          fill: true
+        }]
+      };
+
+      const options = {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            ticks: {
+              callback: function (value) {
+                return value + '%';
+              }
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                return `Completion: ${context.parsed.y.toFixed(1)}%`;
+              }
+            }
+          }
+        }
+      };
+
+      progressChart = new Chart(ctx, {
+        type: currentProgressType,
+        data: data,
+        options: options
+      });
+    }
+
+    // Update completion chart
+    function updateCompletionChart(activities, completedActivities) {
+      const ctx = document.getElementById('completion-chart').getContext('2d');
+      if (completionChart) completionChart.destroy();
+
+      const completionData = calculateCompletionData(activities, completedActivities);
+      const data = {
+        labels: ['Completed', 'Missed', 'Pending'],
+        datasets: [{
+          data: completionData,
+          backgroundColor: ['#28a745', '#dc3545', '#ffc107'],
+          borderColor: ['#1e7e34', '#bd2130', '#d39e00'],
+          borderWidth: 1
+        }]
+      };
+
+      const options = {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                return `${context.label}: ${context.parsed} (${percentage}%)`;
+              }
+            }
+          }
+        },
+        scales: currentCompletionType === 'bar' ? {
+          y: {
+            beginAtZero: true,
+            max: Math.max(...completionData) * 1.2,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        } : undefined
+      };
+
+      completionChart = new Chart(ctx, {
+        type: currentCompletionType,
+        data: data,
+        options: options
+      });
+    }
+
+    // Calculate daily progress
+    function calculateDailyProgress(activities, completedActivities) {
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      return days.map(day => {
+        const dayActivities = activities.filter(activity =>
+          completedActivities[`${activity.name}_${day}`]
+        ).length;
+        return activities.length > 0 ? (dayActivities / activities.length) * 100 : 0;
+      });
+    }
+
+    // Calculate completion data
+    function calculateCompletionData(activities, completedActivities) {
+      const total = activities.length * 7;
+      const completed = Object.values(completedActivities).filter(Boolean).length;
+      const missed = Math.max(0, total - completed);
+      const pending = Math.max(0, total - completed - missed);
+      return [completed, missed, pending];
+    }
+
+    // Get activity status
+    function getActivityStatus(activityName, completedActivities) {
+      const today = new Date().getDay();
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const currentDay = days[today];
+
+      if (completedActivities[`${activityName}_${currentDay}`]) {
+        return { class: 'completed', text: 'Completed' };
+      } else if (new Date().getHours() >= 23) {
+        return { class: 'missed', text: 'Missed' };
+      } else {
+        return { class: 'pending', text: 'Pending' };
+      }
+    }
+
+    // Close modal
+    function closeModal() {
+      userModal.style.display = 'none';
+    }
+
+    // Logout
+    function logout() {
+      localStorage.removeItem('isDadAdmin');
+      window.location.href = 'dad_login.html';
+    }
+
+    // Add function to view user's chart
+    function viewUserChart(username) {
+      localStorage.setItem('viewingUser', username);
+      window.location.href = 'chart.html';
+    }
+
+    // Function to delete a user
+    function deleteUser(username) {
+      if (confirm(`Are you sure you want to delete ${username}'s account? This action cannot be undone.`)) {
+        // Get current users
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+
+        // Remove user from users array
+        users = users.filter(user => user.name !== username);
+
+        // Remove user's data
+        localStorage.removeItem(`activities_${username}`);
+        localStorage.removeItem(`completed_${username}`);
+
+        // Save updated users list
+        localStorage.setItem('users', JSON.stringify(users));
+
+        // Update dashboard
+        updateStatistics(users);
+        createUserCards(users);
+      }
+    }
+
+    // Add search functionality
+    document.getElementById('search-input').addEventListener('input', function (e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+
+      const filteredUsers = users.filter(user =>
+        user.name.toLowerCase().includes(searchTerm)
+      );
+
+      createUserCards(filteredUsers);
+    });
+
+    // Initialize dashboard when page loads
+    document.addEventListener('DOMContentLoaded', initializeDashboard);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration - Daily Tracker</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+
+    .registration-container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+      color: #333;
+      backdrop-filter: blur(10px);
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .registration-container h1 {
+      color: #6a11cb;
+      margin-bottom: 1rem;
+    }
+
+    .welcome-text {
+      color: #666;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .form-group input:focus {
+      border-color: #6a11cb;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+    }
+
+    .password-requirements {
+      text-align: left;
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 0.5rem;
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .password-requirements ul {
+      margin: 0.3rem 0;
+      padding-left: 1.5rem;
+    }
+
+    .password-requirements li {
+      margin: 0.2rem 0;
+    }
+
+    .activities-section {
+      margin-top: 2rem;
+      text-align: left;
+      border-top: 2px solid #eee;
+      padding-top: 1rem;
+    }
+
+    .activities-section h3 {
+      color: #6a11cb;
+      margin-bottom: 1rem;
+    }
+
+    .activity-list {
+      margin: 1rem 0;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .activity-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem;
+      background: #f8f9fa;
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+    }
+
+    .activity-item button {
+      padding: 6px 12px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .add-activity-form {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .add-activity-form input {
+      flex: 1;
+    }
+
+    .add-activity-form button {
+      padding: 12px 20px;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .suggested-activities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .suggested-activity {
+      background: #e9ecef;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    #message {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 5px;
+      display: none;
+    }
+
+    .error-message {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .success-message {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    #submit-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="registration-container">
+    <h1>Create Account</h1>
+    <p class="welcome-text">Join our family tracker to monitor your daily activities</p>
+
+    <form id="registration-form">
+      <div class="form-group">
+        <label for="username">Your Name</label>
+        <input type="text" id="username" placeholder="Enter your name" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Your Passcode</label>
+        <input type="password" id="password" placeholder="Create your passcode" required>
+        <div class="password-requirements">
+          <p>Passcode must contain:</p>
+          <ul>
+            <li id="length">At least 8 characters</li>
+            <li id="uppercase">One uppercase letter</li>
+            <li id="lowercase">One lowercase letter</li>
+            <li id="number">One number</li>
+            <li id="special">One special character</li>
+          </ul>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="confirm-password">Confirm Passcode</label>
+        <input type="password" id="confirm-password" placeholder="Enter your passcode again" required>
+      </div>
+
+      <div class="activities-section">
+        <h3>Set Up Your Activities</h3>
+        <p>Add the activities you want to track daily:</p>
+
+        <div class="suggested-activities">
+          <div class="suggested-activity" onclick="addSuggestedActivity('Exercise', '30 mins')">Exercise (30 mins)</div>
+          <div class="suggested-activity" onclick="addSuggestedActivity('Read', '20 mins')">Read (20 mins)</div>
+          <div class="suggested-activity" onclick="addSuggestedActivity('Study', '45 mins')">Study (45 mins)</div>
+        </div>
+
+        <div class="activity-list" id="activity-list">
+          <!-- Activities will be added here -->
+        </div>
+
+        <div class="add-activity-form">
+          <input type="text" id="activity-name" placeholder="Activity name (e.g., Exercise)">
+          <input type="text" id="activity-time" placeholder="Time (e.g., 30 mins)">
+          <button type="button" onclick="addActivity()">Add</button>
+        </div>
+      </div>
+
+      <div id="message"></div>
+      <button type="submit" id="submit-btn">Create Account</button>
+
+      <div style="margin-top: 1rem;">
+        <a href="login.html" style="color: #6a11cb;">Already have an account? Login here</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Store activities in this array
+    let activities = [];
+
+    // Add activity from form
+    function addActivity() {
+      const name = document.getElementById('activity-name').value.trim();
+      const time = document.getElementById('activity-time').value.trim();
+
+      if (!name || !time) {
+        showMessage('Please enter both activity name and time', 'error');
+        return;
+      }
+
+      // Check if activity already exists
+      if (activities.some(a => a.name.toLowerCase() === name.toLowerCase())) {
+        showMessage('This activity already exists!', 'error');
+        return;
+      }
+
+      activities.push({ name, time });
+      updateActivityList();
+
+      // Clear inputs
+      document.getElementById('activity-name').value = '';
+      document.getElementById('activity-time').value = '';
+    }
+
+    // Add suggested activity
+    function addSuggestedActivity(name, time) {
+      document.getElementById('activity-name').value = name;
+      document.getElementById('activity-time').value = time;
+      addActivity();
+    }
+
+    // Remove activity
+    function removeActivity(index) {
+      activities.splice(index, 1);
+      updateActivityList();
+    }
+
+    // Update the activity list display
+    function updateActivityList() {
+      const activityList = document.getElementById('activity-list');
+      activityList.innerHTML = activities.map((activity, index) => `
+        <div class="activity-item">
+          <span>${activity.name} (${activity.time})</span>
+          <button type="button" onclick="removeActivity(${index})">Remove</button>
+        </div>
+      `).join('');
+    }
+
+    // Show message to user
+    function showMessage(text, type) {
+      const messageDiv = document.getElementById('message');
+      messageDiv.textContent = text;
+      messageDiv.className = type + '-message';
+      messageDiv.style.display = 'block';
+
+      // Hide message after 3 seconds
+      setTimeout(() => {
+        messageDiv.style.display = 'none';
+      }, 3000);
+    }
+
+    // Validate password
+    function validatePassword(password) {
+      const hasMinLength = password.length >= 8;
+      const hasUpperCase = /[A-Z]/.test(password);
+      const hasLowerCase = /[a-z]/.test(password);
+      const hasNumber = /[0-9]/.test(password);
+      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+      return {
+        valid: hasMinLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar,
+        requirements: {
+          length: hasMinLength,
+          uppercase: hasUpperCase,
+          lowercase: hasLowerCase,
+          number: hasNumber,
+          special: hasSpecialChar
+        }
+      };
+    }
+
+    // Handle form submission
+    document.getElementById('registration-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+
+      // Validate password
+      if (password !== confirmPassword) {
+        showMessage('Passwords do not match', 'error');
+        return;
+      }
+
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.valid) {
+        showMessage('Password does not meet requirements', 'error');
+        return;
+      }
+
+      // Check if we have at least 3 activities
+      if (activities.length < 3) {
+        showMessage('Please add at least 3 activities', 'error');
+        return;
+      }
+
+      // Get existing users or initialize empty array
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+
+      // Check if username already exists
+      if (users.some(user => user.name === username)) {
+        showMessage('Username already exists', 'error');
+        return;
+      }
+
+      // Create new user
+      const newUser = {
+        name: username,
+        password: password
+      };
+
+      // Add to users array
+      users.push(newUser);
+
+      // Save to localStorage
+      localStorage.setItem('users', JSON.stringify(users));
+
+      // Save the user's activities
+      localStorage.setItem(`activities_${username}`, JSON.stringify(activities));
+
+      // Initialize empty completed activities object
+      localStorage.setItem(`completed_${username}`, JSON.stringify({}));
+
+      // Show success message
+      showMessage('Registration successful! Redirecting to login...', 'success');
+
+      // Redirect to login after 1.5 seconds
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 1500);
+    });
+
+    // Update password requirements in real-time
+    document.getElementById('password').addEventListener('input', function (e) {
+      const password = e.target.value;
+      const validation = validatePassword(password);
+
+      // Update requirement indicators
+      Object.keys(validation.requirements).forEach(req => {
+        const element = document.getElementById(req);
+        if (validation.requirements[req]) {
+          element.style.color = 'green';
+        } else {
+          element.style.color = 'red';
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
