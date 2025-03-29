@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Daily Tracker</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      height: 100vh;
+    }
+
+    .welcome-container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+      max-width: 700px;
+      width: 90%;
+      padding: 30px;
+    }
+
+    .welcome-container:hover {
+      box-shadow: rgba(0, 0, 0, 0.4) 0px 30px 90px;
+    }
+
+    h1 {
+      font-size: 50px;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .description {
+      margin-bottom: 30px;
+      font-size: 1.2rem;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: nowrap;
+    }
+
+    .button {
+      padding: 15px 30px;
+      font-size: 20px;
+      color: white;
+      border-radius: 50px;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      background-size: 200% auto;
+      transition: all 0.3s ease;
+      background-color: #0093E9;
+      background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+      text-align: center;
+      min-width: 150px;
+      white-space: nowrap;
+    }
+
+    .button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      background-position: right center;
+    }
+
+    @media (max-width: 600px) {
+      .button-container {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="welcome-container">
+    <h1>Welcome to Your Daily Tracker!</h1>
+    <p class="description">Track your daily activities, build habits, and achieve your goals with our intuitive activity
+      tracking system.</p>
+    <div class="button-container">
+      <a href="register.html" class="button">Register</a>
+      <a href="login.html" class="button">Login</a>
+      <a href="dad_login.html" class="button">👨‍👧‍👦 Dad</a>
+    </div>
+  </div>
+</body>
+
+</html>
